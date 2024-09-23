@@ -39,8 +39,11 @@ const SignupPage = () => {
 
       const response = await axios.post("/api/users/signup", user);
 
-      if (response.status === 201) {
+      if (response.data.success === true) {
         router.push("/login");
+      } else {
+        setError(response.data.message);
+        return;
       }
 
       setUser({

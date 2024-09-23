@@ -32,6 +32,9 @@ const SignupPage = () => {
 
       if (response.data.success === true) {
         router.push("/profile");
+      } else {
+        setError(response.data.message);
+        return;
       }
 
       setUser({

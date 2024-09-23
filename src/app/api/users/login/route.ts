@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
 
     if (!email || !password) {
       return NextResponse.json(
-        { error: "All fields are required" },
+        { message: "All fields are required" },
         { status: 400 }
       );
     }
@@ -21,7 +21,7 @@ export async function POST(req: NextRequest) {
 
     if (!user) {
       return NextResponse.json(
-        { error: "User does not exist" },
+        { message: "User does not exist" },
         { status: 400 }
       );
     }
@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
 
     if (!isPasswordCorrect) {
       return NextResponse.json(
-        { error: "Incorrect password" },
+        { message: "Incorrect password" },
         { status: 400 }
       );
     }
