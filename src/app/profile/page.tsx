@@ -1,11 +1,11 @@
 "use client";
 import axios from "axios";
+// import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 
 interface User {
-  _id: string;
   email: string;
   username: string;
   isAdmin: boolean;
@@ -20,24 +20,27 @@ const ProfilePage = () => {
     try {
       const response = await axios.get("/api/users/logout");
 
-      if (response.data.success === true) {
+      if (response.data.success) {
         router.push("/login");
       }
-    } catch (error: any) {
-      console.log(error.message);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const getUserData = async () => {
+    try {
+      const response = await axios.get("/api/users/me");
+      if (response.data.success) {
+        setUserInfo(response.data.user);
+      }
+    } catch (error) {
+      console.log((error as Error).message);
     }
   };
 
   useEffect(() => {
-    const getUser = async () => {
-      try {
-        const response = await axios.get("/api/users/me");
-        setUserInfo(response.data.user);
-      } catch (error: any) {
-        console.log(error.message);
-      }
-    };
-    getUser();
+    getUserData();
   }, []);
 
   return (

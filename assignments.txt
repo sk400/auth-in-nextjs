@@ -1,0 +1,9 @@
+Add these features
+------------------
+
+- Email verification
+- Send email to the user's email (make the auth like an auth of a real world web app)
+- Forgot password
+
+
+How to encrypt user messages in chat app?

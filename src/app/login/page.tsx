@@ -1,9 +1,13 @@
 "use client";
 
+import { sendEmail } from "@/helpers/sendEmail";
+import User from "@/models/User.model";
 import axios from "axios";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
+import jwt from "jsonwebtoken";
+import { passwordResetAction } from "@/actions/passwordResetAction";
 
 const SignupPage = () => {
   const [error, setError] = useState("");
@@ -43,7 +47,7 @@ const SignupPage = () => {
       });
     } catch (error: any) {
       console.log(error);
-      setError(error.message);
+      setError(error.response.data.message);
     } finally {
       setButtonDisabled(false);
       setLoading(false);
@@ -107,7 +111,7 @@ const SignupPage = () => {
           />
         </div>
 
-        {error.length > 0 && (
+        {error?.length > 0 && (
           <p className="text-red-500 text-xs italic">{error}</p>
         )}
         <button
@@ -122,6 +126,18 @@ const SignupPage = () => {
           <Link href="/signup" className="font-bold">
             Sign up
           </Link>
+        </p>
+        <p
+          className="text-xs  mt-2 text-center font-semibold cursor-pointer"
+          onClick={() => {
+            if (user.email.length > 0) {
+              passwordResetAction(user.email);
+            } else {
+              alert("Please provide your email for password reset.");
+            }
+          }}
+        >
+          Forgot Password
         </p>
       </form>
     </div>

@@ -1,60 +1,91 @@
-import { connectToDB } from "@/dbConfig/dbConfig";
+import connectToDB from "@/dbConfig/dbConfig";
+import { NextRequest, NextResponse } from "next/server";
+import { loginFormSchema } from "@/schemas/loginFormSchema";
 import User from "@/models/User.model";
 import bcryptjs from "bcryptjs";
-import { NextRequest, NextResponse } from "next/server";
 import jwt from "jsonwebtoken";
 
 connectToDB();
 
-export async function POST(req: NextRequest) {
+export const POST = async (req: NextRequest) => {
   try {
+    // get inputs
     const { email, password } = await req.json();
 
-    if (!email || !password) {
+    // validate using zod
+
+    const validatedFields = loginFormSchema.safeParse({
+      email,
+      password,
+    });
+
+    if (!validatedFields.success) {
       return NextResponse.json(
-        { message: "All fields are required" },
+        {
+          message: validatedFields.error.message,
+        },
         { status: 400 }
       );
     }
+
+    // check if user exists
 
     const user = await User.findOne({ email });
 
     if (!user) {
       return NextResponse.json(
-        { message: "User does not exist" },
-        { status: 400 }
+        {
+          message: "User does not exist. Please signup",
+        },
+        { status: 404 }
       );
     }
+
+    // check if password is correct
 
     const isPasswordCorrect = await bcryptjs.compare(password, user.password);
 
     if (!isPasswordCorrect) {
       return NextResponse.json(
-        { message: "Incorrect password" },
-        { status: 400 }
+        {
+          message: "Password is incorrect",
+        },
+        { status: 401 }
       );
     }
 
+    // generate token
+
     const tokenData = {
-      id: user._id,
-      email: user.email,
-      username: user.username,
+      id: user?._id.toString(),
+      email: user?.email,
+      username: user?.username,
     };
 
     const token = jwt.sign(tokenData, process.env.TOKEN_SECRET!, {
-      expiresIn: "1d",
+      expiresIn: "10m",
     });
 
+    // set the token in the cookie
+
     const response = NextResponse.json(
-      { message: "Login successful", success: true },
+      {
+        message: "Login successful",
+        success: true,
+      },
       { status: 200 }
     );
+
     response.cookies.set("token", token, {
       httpOnly: true,
+      maxAge: 1000 * 60 * 10,
     });
 
     return response;
   } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json(
+      { message: (error as Error).message },
+      { status: 500 }
+    );
   }
-}
+};

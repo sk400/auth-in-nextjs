@@ -57,7 +57,7 @@ const SignupPage = () => {
       setButtonDisabled(false);
     } catch (error: any) {
       console.log("Sign up failed: ", error);
-      setError(error.message);
+      setError(error.response.data.message);
     } finally {
       setLoading(false);
       setUser({
@@ -163,7 +163,7 @@ const SignupPage = () => {
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
         </div>
-        {error.length > 0 && (
+        {error?.length > 0 && (
           <p className="text-red-500 text-xs italic">{error}</p>
         )}
         <button

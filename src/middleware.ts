@@ -1,21 +1,19 @@
-import { NextResponse } from "next/server";
-import type { NextRequest } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname;
-
-  const publicRoute = path === "/login" || path === "/signup";
   const token = request.cookies.get("token")?.value || "";
+  const publicPath = path === "/signup" || path === "/login";
 
-  if (!publicRoute && !token) {
+  if (!token && !publicPath) {
     return NextResponse.redirect(new URL("/login", request.url));
   }
 
-  if (publicRoute && token) {
+  if (token && publicPath) {
     return NextResponse.redirect(new URL("/", request.url));
   }
 }
 
 export const config = {
-  matcher: ["/", "/profile/:path*", "/login", "/signup"],
+  matcher: ["/", "/login", "/signup", "/profile/:path*"],
 };
